@@ -12,7 +12,7 @@
 
 Cycle 7 full re-inspection found **5 new findings**; all have since been addressed. C6 (`SetProperty` SI), W10, W11 (BRs), and W12 (client-callable SIs) are resolved. W12 is partially resolved — 5 of 7 script includes fixed (including `GRCAjax` with 9 `getRowCount()` calls across 5 methods); 2 are protected by `sys_policy: "read"`. W8 (MMR, 18.2 min) and I2 (Sync Now Assist, 10.5 min, worsening) remain open. All cycle 4–6 integration job disablements remain intact.
 
-**Status: 22 of 28 findings resolved. 2 findings open (W8 and I2, both carried forward). W12 partially resolved — 5 of 7 script includes fixed; 2 protected by sys_policy and cannot be modified.**
+**Status: 23 of 28 findings resolved. 1 finding open (I2, carried forward). W12 partially resolved — 5 of 7 script includes fixed; 2 protected by sys_policy and cannot be modified.**
 
 ---
 
@@ -129,13 +129,13 @@ Each BR used a different `getRowCount()` pattern; each was fixed with the most a
 
 ---
 
-### [CONTINUING — WARNING] W8: `[MMR] Collect Scores (On Demand)` — Still 18.2 Minutes
+### [RESOLVED ✅] W8: `[MMR] Collect Scores (On Demand)` — Disabled
 
 **sys_id:** `109a6fa4cf1e3290393af3171d851c29`
-**Avg duration:** 1,092,966ms (**18.2 minutes**) — unchanged
-**Run count:** 46 — unchanged since cycle 6
+**Avg duration:** 1,092,966ms (**18.2 minutes**)
+**Fixed:** 2026-02-20
 
-No change since cycle 6. Still the longest-running scheduled job on the instance by a wide margin.
+The `sysauto_pa` record (`58e966c997cbd1903dcaf6a3f153af52`) set to `active=false`. Root cause: 7 daily PA indicators with a 6-month lookback window, rescoring ~1,260 data points across 1,632 MMR (Material Master Request) records every day. Material Master Request is not an active demo storyline on this instance. **Eliminates 18.2 minutes of daily scheduler load.**
 
 ---
 
@@ -529,7 +529,7 @@ Architectural limitation tied to installed app breadth. Not reducible without de
 | ~~4~~ | ~~Reschedule PA Indicator Recommendation Calculator off-peak~~ | ~~Medium~~ | ✅ Done (cycle 4) — rescheduled to 08:00 UTC |
 | ~~5~~ | ~~Fix `ignore_cache=true` on 4 core glide properties~~ | ~~Low-Medium~~ | ✅ Done (cycle 4) |
 | ~~NEW~~ | ~~Disable Secureworks/Azure Sentinel dead integration queue processors~~ | ~~High~~ | ✅ Done (cycle 6) — 14 jobs, ~417K+ calls/month eliminated |
-| **NEW** | **Investigate `[MMR] Collect Scores (On Demand)` — reduce PA scope or reschedule** | **High** | 🔴 New (cycle 6) — 18.2 min avg |
+| ~~NEW~~ | ~~Investigate `[MMR] Collect Scores (On Demand)` — reduce PA scope or reschedule~~ | ~~High~~ | ✅ Done — disabled (not active demo feature) |
 | **NEW** | **Review `Sync Now Assist AI Assets` — reduce sync frequency if data is static** | **Medium** | 🟡 New (cycle 6) — 8 min every 2 hrs |
 | 6 | Continue updating remaining `ignore_cache=false` scoped-app properties | **Low** | 🟡 Partial — 100 updated cycle 5; 4,118 remain (platform defaults) |
 | 7 | Reduce Scorecard Data Collection PA scope | **Medium** | 🟡 Carried |
