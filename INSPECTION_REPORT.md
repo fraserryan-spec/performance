@@ -2,9 +2,11 @@
 
 **Instance:** scvoice1 (https://scvoice1.service-now.com)
 **Inspected:** 2026-02-20 (cycle 7 — full re-inspection)
+**Closed:** 2026-02-20
 **Previous Inspection:** 2026-02-19 (cycle 6)
 **Instance Version:** Zurich Patch 6 Hotfix 1 (build 02-09-2026)
 **Background Script Execution:** Unavailable (Scripted REST API not configured or readOnly mode active)
+**Final Status:** CLOSED — 24 of 28 findings resolved. W12 partially resolved (2 of 7 SIs protected by sys_policy). No open action items.
 
 ---
 
@@ -532,7 +534,7 @@ Architectural limitation tied to installed app breadth. Not reducible without de
 | ~~5~~ | ~~Fix `ignore_cache=true` on 4 core glide properties~~ | ~~Low-Medium~~ | ✅ Done (cycle 4) |
 | ~~NEW~~ | ~~Disable Secureworks/Azure Sentinel dead integration queue processors~~ | ~~High~~ | ✅ Done (cycle 6) — 14 jobs, ~417K+ calls/month eliminated |
 | ~~NEW~~ | ~~Investigate `[MMR] Collect Scores (On Demand)` — reduce PA scope or reschedule~~ | ~~High~~ | ✅ Done — disabled (not active demo feature) |
-| **NEW** | **Review `Sync Now Assist AI Assets` — reduce sync frequency if data is static** | **Medium** | 🟡 New (cycle 6) — 8 min every 2 hrs |
+| ~~NEW~~ | ~~Review `Sync Now Assist AI Assets` — reduce sync frequency if data is static~~ | ~~Medium~~ | ✅ Done (cycle 7) — changed from hourly to daily; ~81 min/day recovered |
 | 6 | Continue updating remaining `ignore_cache=false` scoped-app properties | **Low** | 🟡 Partial — 100 updated cycle 5; 4,118 remain (platform defaults) |
 | 7 | Reduce Scorecard Data Collection PA scope | **Medium** | 🟡 Carried |
 | 8 | Review SLO: Error Budget job configuration | **Medium** | 🟡 Carried |
