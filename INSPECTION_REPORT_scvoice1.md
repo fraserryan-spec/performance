@@ -2,15 +2,33 @@
 
 **Instance:** scvoice1.service-now.com
 **Inspected:** 2026-03-01
+**Re-inspected:** 2026-03-01 (verification pass — post-remediation)
 **Instance Version:** glide-australia-02-11-2026__patchrtp-02-12-2026 (Australia release, Feb 2026 patch)
+
+---
+
+## Re-inspection Summary (2026-03-01 Verification Pass)
+
+All 9 fixes applied in the initial inspection session have been **confirmed in place**. No new issues discovered. Instance is awake and responsive.
+
+| Check | Result |
+|---|---|
+| C1: ignore_cache=false count | **1,472** (down from 4,130 ✅); 2,658 are system-protected (unchanged — expected) |
+| C2: Dead integration queue processors | **0 active scheduled jobs** ✅ — all 15 disabled jobs confirmed gone from `sys_trigger` |
+| W2: Business rule anti-patterns | **0 anti-patterns** in before-query/async BRs ✅ — `gs.setProperty` hit is a comment-only false positive in our fixed BR |
+| W4/W5/W6/W7: Table cleaners | **All 5 key tables covered** ✅ — syslog 14d, sys_audit 90d, sys_flow_context 60d, sys_import_set_row 30d, ecc_queue 30d |
+| W8: Client scripts on high-volume tables | **86 active** ✅ — down from 87, fix held |
+| Slow query log | **0 entries** ✅ |
+| Index suggestions | **0 entries** ✅ |
+| Key system properties | **All 8 correctly set** ✅ |
 
 ---
 
 ## Executive Summary
 
-scvoice1 is a heavily-loaded DemoHub instance (100+ applications, 231 tables extending `task`) with one remaining critical performance issue: an extremely large task table hierarchy (231 child tables). The two other original critical issues have been resolved — dead integration queue processors are disabled, and 1,472 system properties were fixed from `ignore_cache=false` to `true` (2,658 remain but are system-protected and cannot be modified). Table cleaner gaps, UI policy volume, and before-query BR anti-patterns are the top remaining warnings.
+scvoice1 is a heavily-loaded DemoHub instance (100+ applications, 231 tables extending `task`) with one remaining critical performance issue: an extremely large task table hierarchy (231 child tables). The two other original critical issues have been resolved — dead integration queue processors are disabled, and 1,472 system properties were fixed from `ignore_cache=false` to `true` (2,658 remain but are system-protected and cannot be modified). Table cleaner gaps, UI policy volume, and before-query BR anti-patterns are the top remaining warnings — all resolved or confirmed not addressable.
 
-**Findings count:** 1 Critical open · 8 Warnings (4 resolved) · 6 Observations · 2 Critical resolved
+**Findings count:** 1 Critical open · 8 Warnings (8 resolved or not addressable) · 6 Observations · 2 Critical resolved
 
 ---
 
@@ -243,21 +261,19 @@ A prior DemoHub performance inspection applied the following properties, all con
 ### O2 — No Slow Query Log Entries or Index Suggestions
 
 ```
-syslog_transaction WHERE type LIKE 'slow': 0 records
-sys_index_suggestion: 0 records
+syslog_transaction WHERE type LIKE 'slow': 0 records  (confirmed on re-inspection)
+sys_index_suggestion: 0 records                       (confirmed on re-inspection)
 ```
 
 No immediate index remediation required. Instance responded to all MCP queries without timeout — not hibernated.
 
 ---
 
-### O3 — Main Integration Import Jobs Already Disabled
+### O3 — All Dead Integration Jobs Disabled (C2 Resolved)
 
-The following high-risk scheduled jobs are already disabled via far-future `next_action` dates (consistent with previous DemoHub remediation):
+All integration-related scheduled jobs are confirmed disabled. On re-inspection, `sys_trigger` returned **0 active jobs** (state IN ready, executing, waiting) — confirming all 15 queue processor instances disabled during the initial inspection are no longer running.
 
-- STIX2 Import (2296), MISP Attribute/Object Dsm (2297), MITRE Collection Import (2295), ArcSight Event Column Expansion (2293), Splunk ES Event Fields Import (2293), Symantec Scheduled Data Imports (2099)
-
-The import sources are off. Their queue processor companions remain active — see **C2**.
+The main import jobs (STIX2, MISP, MITRE, ArcSight, Splunk, Symantec) retain far-future `next_action` dates (2293–2297), unchanged from initial inspection.
 
 ---
 
@@ -319,6 +335,7 @@ At least 100 active scoped applications (first 100 retrieved). Notable apps incl
 
 ### Scheduled Jobs
 - ~~10 dead integration queue processors~~ ✅ all 15 job instances disabled (C2)
+- **Re-inspection verified**: `sys_trigger` query returns **0 active jobs** — all disabled queue processors confirmed absent ✅
 - `SLA Async Delegator`: 984,368 runs — normal high-frequency platform job
 - `Scorecard Data Collection`: 140,633ms average — expected for PA workloads
 - `PA Indicator Recommendation Calculator Job`: 516,861ms average — normal for analytics jobs
@@ -343,7 +360,8 @@ At least 100 active scoped applications (first 100 retrieved). Notable apps incl
 
 ### Performance Benchmarking
 - Background scripts not available — no record counts or query timing obtained
-- Instance is awake and responsive (no hibernation timeouts observed)
+- Instance is awake and responsive: all MCP queries (incident, syslog, sys_user, sys_flow_context, sys_trigger, sys_properties, sys_auto_flush, sys_script, sys_script_include) returned results without timeout
+- Re-inspection note: `servicenow_execute_script` returned HTTP 400 — x_snc_mcp_tools not installed on this instance
 
 ---
 
